@@ -1,0 +1,13 @@
+# Build output
+target/
+
+# Local database files
+data/
+
+# IDE/project-local files
+.idea/
+.vscode/
+
+# OS cruft
+.DS_Store
+Thumbs.db
