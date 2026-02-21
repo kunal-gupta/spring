@@ -21,7 +21,7 @@
 
     <properties>
         <!-- Java version used for compile/run -->
-        <java.version>17</java.version>
+        <java.version>21</java.version>
     </properties>
 
     <dependencies>

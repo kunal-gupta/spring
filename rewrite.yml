@@ -1,0 +1,7 @@
+---
+activeRecipes:
+  - org.openrewrite.java.migrate.UpgradeToJava21
+---
+recipeConfigs:
+  - name: org.openrewrite.java.migrate.UpgradeToJava21
+    artifact: org.openrewrite.recipe:rewrite-migrate-java:2.31.1
