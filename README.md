@@ -1,94 +1,92 @@
-# Spring Boot Visitor App
+# Visitor Logging App
 
-Backend API to log office visitors and track meeting history.
+## Use Case
+This application is for offices/firms that want to log visitor entries digitally and avoid manual register-based record keeping.
 
-## Current Status
+It helps front-desk/admin teams:
+- Register and login securely
+- Log each visitor visit with purpose/notes
+- Search visitors by phone/email
+- View complete visit history for repeat visitors
 
-- Base package renamed to `com.visitorapp` (removed `example`).
-- Uses Spring Data JPA repositories with derived query methods.
-- Includes core APIs and additional reference APIs for learning query derivation.
+## Why This App
+- Removes dependency on paper registers
+- Makes visitor history searchable in seconds
+- Reduces duplicate/incorrect manual entries
+- Keeps records persistent across app restarts
 
 ## Tech Stack
-
 - Java 21
 - Spring Boot 3
+- Spring Security + JWT
 - Spring Web
 - Spring Data JPA
 - Bean Validation
-- Lombok
 - HSQLDB (file-based)
+- React (served by Spring Boot)
 
-## Project Structure
+## Main URLs
+- App UI: `http://localhost:8080`
+- Register: `http://localhost:8080/register`
+- Login: `http://localhost:8080/login`
+- Visit lookup: `http://localhost:8080/visit`
 
-- Main app: `src/main/java/com/visitorapp/VisitorAppApplication.java`
-- Controller: `src/main/java/com/visitorapp/controller/VisitorController.java`
-- Service: `src/main/java/com/visitorapp/service/VisitorService.java`
-- Repositories:
-  - `src/main/java/com/visitorapp/repository/VisitorRepository.java`
-  - `src/main/java/com/visitorapp/repository/VisitRepository.java`
-- Entities:
-  - `src/main/java/com/visitorapp/model/Visitor.java`
-  - `src/main/java/com/visitorapp/model/Visit.java`
+## How It Works (User Flow)
+1. User registers from UI (`/register`) or logs in (`/login`).
+2. JWT token is issued after successful auth.
+3. User enters mobile/email in visit lookup screen.
+4. App opens workspace with:
+- Left: new visit log form
+- Right: visitor summary + visit history
+5. Visit is stored in DB and can be searched later.
 
-## Run
+## Run Locally (Single Command)
+From project root:
 
 ```bash
 mvn spring-boot:run
 ```
 
-App URL: `http://localhost:8080`
+Open:
 
-## Database
+`http://localhost:8080`
 
-- HSQLDB URL: `jdbc:hsqldb:file:./data/visitor-db`
-- DB files are created under `./data`
-- Schema update mode: `spring.jpa.hibernate.ddl-auto=update`
+## Database Location
+Configured as:
 
-## Core APIs
+`jdbc:hsqldb:file:./data/visitor-db`
 
-1. Log visit  
-`POST /api/visitors/visits`
+So DB files are created in:
+- `data/visitor-db.script`
+- `data/visitor-db.properties`
+- `data/visitor-db.log`
 
-Sample body:
-```json
-{
-  "name": "Ravi Kumar",
-  "address": "New Delhi",
-  "phone": "9876543210",
-  "email": "ravi@example.com",
-  "designation": "Vendor",
-  "purpose": "Product demo",
-  "notes": "Requested follow-up next week"
-}
+## API Highlights
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /api/visitors/visits`
+- `GET /api/visitors/search?email=...` or `?phone=...`
+- `GET /api/visitors/{visitorId}/history`
+
+## Distributable Build
+Create shareable artifacts:
+
+```bash
+mvn clean package -DskipTests
 ```
 
-2. Search visitor  
-`GET /api/visitors/search?email=ravi@example.com`  
-`GET /api/visitors/search?phone=9876543210`
+Outputs:
+- Runnable jar: `target/spring-boot-visitor-app-0.0.1-SNAPSHOT.jar`
+- Distribution zip: `target/spring-boot-visitor-app-0.0.1-SNAPSHOT-distribution.zip`
 
-3. Full visit history  
-`GET /api/visitors/{visitorId}/history`
+ZIP includes:
+- application jar
+- `startup.bat`
+- `README.txt`
+- empty `data/` folder
 
-## Derived Query Reference APIs
-
-These are added as practical examples for Spring Data derived method names.
-
-- `GET /api/visitors/reference/by-phone?phone=9876543210`
-- `GET /api/visitors/reference/by-email-and-phone?email=ravi@example.com&phone=9876543210`
-- `GET /api/visitors/reference/exists-by-email?email=ravi@example.com`
-- `DELETE /api/visitors/reference/by-phone?phone=9876543210`
-- `GET /api/visitors/reference/by-ids?ids=1,2,3`
-- `GET /api/visitors/reference/search-by-name?text=ravi`
-- `GET /api/visitors/reference/without-email`
-- `GET /api/visitors/reference/top5-by-name`
-- `GET /api/visitors/reference/top10-latest`
-- `GET /api/visitors/reference/{visitorId}/first-visit`
-- `GET /api/visitors/reference/visits-between?from=2026-01-01T00:00:00&to=2026-12-31T23:59:59`
-
-## Validation and Error Behavior
-
-- At least one identifier (`email` or `phone`) is required while logging a visit.
-- If provided email and phone map to different visitors, API returns `400`.
-- Unknown visitor in search/history APIs returns `404`.
-- `DELETE /reference/by-phone` returns `400` if visitor has existing visit history.
-- `visits-between` expects ISO date-time format for `from` and `to`.
+## Run Packaged App
+After unzip:
+1. Ensure Java 21+ is installed
+2. Run `startup.bat`
+3. Open `http://localhost:8080`
