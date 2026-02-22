@@ -1,5 +1,8 @@
 # Build output
 target/
+out/
+*.class
+*.log
 
 # Local database files
 data/
@@ -7,6 +10,26 @@ data/
 # IDE/project-local files
 .idea/
 .vscode/
+*.iml
+
+# Maven wrapper/cache (optional local)
+.mvn/wrapper/maven-wrapper.jar
+
+# Frontend generated/local files
+frontend/node_modules/
+frontend/node/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Temporary upgrade assistant output
+.github/java-upgrade/
 
 # OS cruft
 .DS_Store
