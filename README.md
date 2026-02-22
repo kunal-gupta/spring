@@ -15,6 +15,9 @@ It helps front-desk/admin teams:
 - Reduces duplicate/incorrect manual entries
 - Keeps records persistent across app restarts
 
+## Development Note
+This codebase was developed entirely by Codex 5.3 in collaboration with Visual Studio Code.
+
 ## Tech Stack
 - Java 21
 - Spring Boot 3
