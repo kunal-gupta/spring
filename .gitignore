@@ -4,6 +4,7 @@ dist/
 out/
 *.class
 *.log
+logs/
 
 # Local database files
 data/
