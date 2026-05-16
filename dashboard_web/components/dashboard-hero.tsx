@@ -1,0 +1,342 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { dashboardApi } from "@/lib/api";
+import { SalesTrendChart } from "@/components/sales-trend-chart";
+import {
+  BarChart3,
+  Boxes,
+  CircleDollarSign,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ReceiptText,
+  RefreshCcw
+} from "lucide-react";
+import { useState } from "react";
+
+type AnalysisTab = "overview" | "sales" | "products" | "profitability" | "refunds" | "gridStudio" | "storyboard";
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0
+  }).format(value);
+}
+
+function formatCompact(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1
+  }).format(value);
+}
+
+export function DashboardHero() {
+  const summary = useQuery({ queryKey: ["summary"], queryFn: dashboardApi.summary });
+  const trend = useQuery({ queryKey: ["sales-trend"], queryFn: dashboardApi.salesTrend });
+  const metadata = useQuery({ queryKey: ["metadata"], queryFn: dashboardApi.metadata });
+  const [activeTab, setActiveTab] = useState<AnalysisTab>("overview");
+  const [isDocked, setIsDocked] = useState(true);
+
+  if (summary.isLoading || trend.isLoading || metadata.isLoading) {
+    return <main className="min-h-screen px-6 py-8 text-slate-100">Loading dashboard...</main>;
+  }
+
+  if (summary.isError || trend.isError || metadata.isError || !summary.data || !trend.data || !metadata.data) {
+    return <main className="min-h-screen px-6 py-8 text-slate-100">Unable to load dashboard data.</main>;
+  }
+
+  const heroMetrics = [
+    { label: "Revenue", value: formatCurrency(summary.data.revenue), detail: "Commercial scale" },
+    { label: "Orders", value: formatCompact(summary.data.orders), detail: "Demand signal" },
+    { label: "Gross margin", value: `${summary.data.grossMarginPct}%`, detail: "Profit quality" },
+    { label: "Refunds", value: formatCurrency(summary.data.refunds), detail: `${summary.data.refundRatePct}% revenue drag` }
+  ];
+
+  const tabs = [
+    { id: "overview" as const, label: "Executive Overview", icon: BarChart3 },
+    { id: "sales" as const, label: "Sales Performance", icon: CircleDollarSign },
+    { id: "products" as const, label: "Product Intelligence", icon: Boxes },
+    { id: "profitability" as const, label: "Profitability", icon: ReceiptText },
+    { id: "refunds" as const, label: "Refunds & Quality", icon: RefreshCcw },
+    { id: "gridStudio" as const, label: "Grid Studio", icon: Boxes },
+    { id: "storyboard" as const, label: "Storyboard", icon: BarChart3 }
+  ];
+
+  const analysisContent = {
+    overview: (
+      <>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {heroMetrics.map((metric) => (
+            <article
+              key={metric.label}
+              className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-2xl shadow-cyan-950/20 backdrop-blur"
+            >
+              <p className="text-sm text-slate-400">{metric.label}</p>
+              <p className="mt-3 text-3xl font-semibold">{metric.value}</p>
+              <p className="mt-2 text-sm text-cyan-200">{metric.detail}</p>
+            </article>
+          ))}
+        </div>
+        <SalesTrendChart points={trend.data} />
+      </>
+    ),
+    sales: (
+      <>
+        <div className="grid gap-4 md:grid-cols-3">
+          <MetricCard label="Orders" value={formatCompact(summary.data.orders)} detail="Demand volume" />
+          <MetricCard label="Average order value" value={formatCurrency(summary.data.avgOrderValue)} detail="Basket strength" />
+          <MetricCard label="Items sold" value={formatCompact(summary.data.itemsSold)} detail="Units moved" />
+        </div>
+        <SalesTrendChart points={trend.data} />
+      </>
+    ),
+    products: (
+      <InsightPanel
+        title="Product intelligence"
+        body={`The catalog currently contains ${metadata.data.products.length} products. This tab is ready for the next vertical slice: contribution mix, unit volume, and margin by product.`}
+      />
+    ),
+    profitability: (
+      <>
+        <div className="grid gap-4 md:grid-cols-3">
+          <MetricCard label="Gross profit" value={formatCurrency(summary.data.grossProfit)} detail="Revenue after COGS" />
+          <MetricCard label="Gross margin" value={`${summary.data.grossMarginPct}%`} detail="Profit quality" />
+          <MetricCard label="Net revenue" value={formatCurrency(summary.data.netRevenue)} detail="After refunds" />
+        </div>
+        <InsightPanel
+          title="Profitability lens"
+          body="This view separates scale from quality: revenue shows momentum, while gross margin reveals whether the business is becoming more valuable as it grows."
+        />
+      </>
+    ),
+    refunds: (
+      <>
+        <div className="grid gap-4 md:grid-cols-3">
+          <MetricCard label="Refunds" value={formatCurrency(summary.data.refunds)} detail="Value returned" />
+          <MetricCard label="Refund rate" value={`${summary.data.refundRatePct}%`} detail="Revenue drag" />
+          <MetricCard label="Net revenue" value={formatCurrency(summary.data.netRevenue)} detail="Retained value" />
+        </div>
+        <InsightPanel
+          title="Refund pressure"
+          body="Refunds are small enough to preserve the story of growth, but large enough to deserve their own operating lens as the dashboard deepens."
+        />
+      </>
+    ),
+    gridStudio: (
+      <>
+        <section className="rounded-[2rem] border border-cyan-300/20 bg-cyan-300/[0.05] p-5 shadow-2xl shadow-cyan-950/20">
+          <div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <p className="text-sm uppercase tracking-[0.22em] text-cyan-300">Root grid editor</p>
+              <h2 className="mt-2 text-2xl font-semibold">Nested scorecard composition</h2>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <EditorBadge label="Child free flow editor" />
+              <EditorBadge label="Child grid editor" />
+              <EditorBadge label="Child auto editor" />
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-[1.05fr_1fr]">
+            <div className="rounded-[1.6rem] border border-white/10 bg-slate-950/20 p-4">
+              <p className="mb-4 text-xs uppercase tracking-[0.22em] text-slate-400">Child free flow editor</p>
+              <SalesTrendChart points={trend.data.slice(-12)} />
+            </div>
+
+            <div className="rounded-[1.6rem] border border-white/10 bg-slate-950/20 p-4">
+              <p className="mb-4 text-xs uppercase tracking-[0.22em] text-slate-400">Child grid editor · 2 tiles per row</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <MetricCard label="Revenue" value={formatCurrency(summary.data.revenue)} detail="Scale" />
+                <MetricCard label="Orders" value={formatCompact(summary.data.orders)} detail="Demand" />
+                <MetricCard label="Gross profit" value={formatCurrency(summary.data.grossProfit)} detail="Value" />
+                <MetricCard label="Gross margin" value={`${summary.data.grossMarginPct}%`} detail="Efficiency" />
+                <MetricCard label="Refunds" value={formatCurrency(summary.data.refunds)} detail="Leakage" />
+                <MetricCard label="Net revenue" value={formatCurrency(summary.data.netRevenue)} detail="Outcome" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 shadow-2xl shadow-slate-950/20">
+          <p className="mb-4 text-xs uppercase tracking-[0.22em] text-slate-400">Child auto editor</p>
+          <SummaryGrid
+            rows={[
+              ["Revenue", formatCurrency(summary.data.revenue), "Scale"],
+              ["Net revenue", formatCurrency(summary.data.netRevenue), "Retained value"],
+              ["Average order value", formatCurrency(summary.data.avgOrderValue), "Basket strength"],
+              ["Refund rate", `${summary.data.refundRatePct}%`, "Quality signal"]
+            ]}
+          />
+        </section>
+      </>
+    ),
+    storyboard: (
+      <>
+        <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-white/[0.04] to-fuchsia-300/10 p-6 shadow-2xl shadow-cyan-950/20">
+          <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+            <div>
+              <p className="text-sm uppercase tracking-[0.25em] text-cyan-300">More promising layout</p>
+              <h2 className="mt-3 max-w-xl text-4xl font-semibold leading-tight">
+                Growth is strongest when revenue, margin, and retention move together.
+              </h2>
+              <p className="mt-5 max-w-xl leading-7 text-slate-300">
+                This composition leads with the verdict, not the widgets. The supporting modules then prove the story with a deliberate hierarchy.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <MetricCard label="Revenue" value={formatCurrency(summary.data.revenue)} detail="Top-line momentum" />
+              <MetricCard label="Gross profit" value={formatCurrency(summary.data.grossProfit)} detail="Value created" />
+              <MetricCard label="Orders" value={formatCompact(summary.data.orders)} detail="Demand engine" />
+              <MetricCard label="Refund drag" value={`${summary.data.refundRatePct}%`} detail="Leakage watch" />
+            </div>
+          </div>
+        </section>
+
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <SalesTrendChart points={trend.data} />
+          <article className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur">
+            <p className="text-sm uppercase tracking-[0.22em] text-cyan-300">Narrative stack</p>
+            <div className="mt-5 space-y-4">
+              <StoryBeat title="1. Scale" body={`${formatCurrency(summary.data.revenue)} in revenue establishes the business frame.`} />
+              <StoryBeat title="2. Quality" body={`${summary.data.grossMarginPct}% gross margin shows that growth keeps its value.`} />
+              <StoryBeat title="3. Leakage" body={`${formatCurrency(summary.data.refunds)} in refunds becomes the question worth drilling into next.`} />
+            </div>
+          </article>
+        </div>
+
+        <SummaryGrid
+          rows={[
+            ["Orders", formatCompact(summary.data.orders), "Demand"],
+            ["Items sold", formatCompact(summary.data.itemsSold), "Volume"],
+            ["Gross margin", `${summary.data.grossMarginPct}%`, "Efficiency"],
+            ["Net revenue", formatCurrency(summary.data.netRevenue), "Outcome"]
+          ]}
+        />
+      </>
+    )
+  };
+
+  return (
+    <main className="min-h-screen px-4 py-4 text-slate-100 md:px-6 lg:px-8">
+      <section className="mx-auto flex max-w-7xl gap-5">
+        <aside
+          className={`shrink-0 rounded-[2rem] border border-white/10 bg-slate-950/60 p-4 shadow-2xl shadow-slate-950/30 backdrop-blur transition-all ${
+            isDocked ? "w-72" : "w-20"
+          }`}
+          aria-label="Analysis navigation"
+        >
+          <div className="mb-6 flex items-center justify-between gap-3">
+            {isDocked ? (
+              <div>
+                <p className="text-sm uppercase tracking-[0.25em] text-cyan-300">BI Dashboard</p>
+                <p className="mt-1 text-xs text-slate-400">Analysis groups</p>
+              </div>
+            ) : null}
+            <button
+              aria-label={isDocked ? "Undock sidebar" : "Dock sidebar"}
+              className="rounded-2xl border border-white/10 p-2 text-slate-300 transition hover:bg-white/10"
+              onClick={() => setIsDocked((current) => !current)}
+              type="button"
+            >
+              {isDocked ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+            </button>
+          </div>
+
+          <nav role="tablist" aria-label="Dashboard analyses" className="space-y-2">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const selected = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  aria-selected={selected}
+                  className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
+                    selected ? "bg-cyan-400 text-slate-950" : "text-slate-300 hover:bg-white/10"
+                  }`}
+                  onClick={() => setActiveTab(tab.id)}
+                  role="tab"
+                  type="button"
+                >
+                  <Icon size={18} />
+                  {isDocked ? <span className="text-sm font-medium">{tab.label}</span> : null}
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
+
+        <div className="min-w-0 flex-1 rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 shadow-2xl shadow-slate-950/20 backdrop-blur md:p-8">
+        <div className="max-w-3xl">
+          <p className="mb-3 text-sm uppercase tracking-[0.3em] text-cyan-300">Maven Fuzzy Factory</p>
+          <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
+            A dashboard should read like a business story.
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300 md:text-lg">
+            Start with the health of the business, then reveal the forces underneath: product mix, profitability, and refund pressure.
+          </p>
+          <p className="mt-4 text-sm text-slate-400">
+            Reporting period: {metadata.data.minDate} to {metadata.data.maxDate}
+          </p>
+        </div>
+
+          <div className="mt-8 flex flex-col gap-6" role="tabpanel">
+            {analysisContent[activeTab]}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function MetricCard({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <article className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-2xl shadow-cyan-950/20 backdrop-blur">
+      <p className="text-sm text-slate-400">{label}</p>
+      <p className="mt-3 text-3xl font-semibold">{value}</p>
+      <p className="mt-2 text-sm text-cyan-200">{detail}</p>
+    </article>
+  );
+}
+
+function InsightPanel({ title, body }: { title: string; body: string }) {
+  return (
+    <article className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur">
+      <p className="text-sm uppercase tracking-[0.22em] text-cyan-300">Insight</p>
+      <h2 className="mt-3 text-2xl font-semibold">{title}</h2>
+      <p className="mt-4 max-w-3xl leading-7 text-slate-300">{body}</p>
+    </article>
+  );
+}
+
+function SummaryGrid({ rows }: { rows: Array<[string, string, string]> }) {
+  return (
+    <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-slate-950/20 backdrop-blur">
+      <div className="grid grid-cols-[1.2fr_1fr_1fr] border-b border-white/10 px-5 py-3 text-xs uppercase tracking-[0.2em] text-slate-400">
+        <span>Metric</span>
+        <span>Value</span>
+        <span>Signal</span>
+      </div>
+      {rows.map(([metric, value, signal]) => (
+        <div key={metric} className="grid grid-cols-[1.2fr_1fr_1fr] border-b border-white/5 px-5 py-4 last:border-b-0">
+          <span className="text-slate-300">{metric}</span>
+          <span className="font-medium text-white">{value}</span>
+          <span className="text-cyan-200">{signal}</span>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function StoryBeat({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+      <p className="font-medium text-white">{title}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
+    </div>
+  );
+}
+
+function EditorBadge({ label }: { label: string }) {
+  return <span className="rounded-full border border-cyan-200/20 bg-cyan-200/10 px-3 py-1 text-cyan-100">{label}</span>;
+}

@@ -1,0 +1,38 @@
+target/
+.idea/
+.vscode/
+*.iml
+.DS_Store
+# Compiled class files
+**/*.class
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+*.swp
+
+# Maven wrapper and build artifacts
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+
+# Node / frontend build artifacts
+node_modules/
+dashboard_web/node_modules/
+dashboard_web/.next/
+dashboard_web/out/
+dashboard_web/dist/
+
+# Frontend test and coverage artifacts
+dashboard_web/coverage/
+dashboard_web/test-results/
+
+# Eclipse/IntelliJ project files
+.classpath
+.project
+.settings/
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini

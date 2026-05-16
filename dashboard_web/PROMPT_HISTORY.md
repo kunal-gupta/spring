@@ -1,0 +1,1 @@
+- 2026-05-17: Implement Sprint 1 foundation with DuckDB ingestion, live summary/trend/metadata APIs, Highcharts-backed overview UI, and Spring Boot-hosted frontend assets.
