@@ -35,7 +35,7 @@ export function DashboardHero() {
   const summary = useQuery({ queryKey: ["summary"], queryFn: dashboardApi.summary });
   const trend = useQuery({ queryKey: ["sales-trend"], queryFn: dashboardApi.salesTrend });
   const metadata = useQuery({ queryKey: ["metadata"], queryFn: dashboardApi.metadata });
-  const [activeTab, setActiveTab] = useState<AnalysisTab>("overview");
+  const [activeTab, setActiveTab] = useState<AnalysisTab>("gridStudio");
   const [isDocked, setIsDocked] = useState(true);
 
   if (summary.isLoading || trend.isLoading || metadata.isLoading) {
@@ -54,12 +54,12 @@ export function DashboardHero() {
   ];
 
   const tabs = [
+    { id: "gridStudio" as const, label: "Sales Insight", icon: Boxes },
     { id: "overview" as const, label: "Executive Overview", icon: BarChart3 },
     { id: "sales" as const, label: "Sales Performance", icon: CircleDollarSign },
     { id: "products" as const, label: "Product Intelligence", icon: Boxes },
     { id: "profitability" as const, label: "Profitability", icon: ReceiptText },
     { id: "refunds" as const, label: "Refunds & Quality", icon: RefreshCcw },
-    { id: "gridStudio" as const, label: "Sales Insight", icon: Boxes },
     { id: "storyboard" as const, label: "Storyboard", icon: BarChart3 }
   ];
 
