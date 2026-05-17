@@ -149,12 +149,12 @@ export function DashboardHero() {
               <p className="mb-2 text-xs uppercase tracking-[0.22em] text-slate-400">KPI tiles</p>
               <p className="mb-4 text-sm text-slate-300">Six core metrics for a quick read.</p>
               <div className="grid gap-4 sm:grid-cols-2">
-                <MetricCard label="Revenue" value={formatCurrency(summary.data.revenue)} detail="Scale" />
-                <MetricCard label="Orders" value={formatCompact(summary.data.orders)} detail="Demand" />
-                <MetricCard label="Gross profit" value={formatCurrency(summary.data.grossProfit)} detail="Value" />
-                <MetricCard label="Gross margin" value={`${summary.data.grossMarginPct}%`} detail="Efficiency" />
-                <MetricCard label="Refunds" value={formatCurrency(summary.data.refunds)} detail="Leakage" />
-                <MetricCard label="Net revenue" value={formatCurrency(summary.data.netRevenue)} detail="Outcome" />
+                <MetricCard label="Revenue" value={formatCurrency(summary.data.revenue)} detail="Scale" indicatorColor="green" />
+                <MetricCard label="Orders" value={formatCompact(summary.data.orders)} detail="Demand" indicatorColor="green" />
+                <MetricCard label="Gross profit" value={formatCurrency(summary.data.grossProfit)} detail="Value" indicatorColor="yellow" />
+                <MetricCard label="Gross margin" value={`${summary.data.grossMarginPct}%`} detail="Efficiency" indicatorColor="yellow" />
+                <MetricCard label="Refunds" value={formatCurrency(summary.data.refunds)} detail="Leakage" indicatorColor="red" />
+                <MetricCard label="Net revenue" value={formatCurrency(summary.data.netRevenue)} detail="Outcome" indicatorColor="green" />
               </div>
             </div>
           </div>
@@ -238,7 +238,7 @@ export function DashboardHero() {
             ) : null}
             <button
               aria-label={isDocked ? "Undock sidebar" : "Dock sidebar"}
-              className="rounded-2xl border border-white/10 p-2 text-slate-300 transition hover:bg-white/10"
+              className="cursor-pointer rounded-2xl border border-white/10 p-2 text-slate-300 transition hover:bg-white/10"
               onClick={() => setIsDocked((current) => !current)}
               type="button"
             >
@@ -254,7 +254,7 @@ export function DashboardHero() {
                 <button
                   key={tab.id}
                   aria-selected={selected}
-                  className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
+                  className={`flex w-full cursor-pointer items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
                     selected ? "bg-cyan-400 text-slate-950" : "text-slate-300 hover:bg-white/10"
                   }`}
                   onClick={() => setActiveTab(tab.id)}
@@ -292,9 +292,17 @@ export function DashboardHero() {
   );
 }
 
-function MetricCard({ label, value, detail }: { label: string; value: string; detail: string }) {
+function MetricCard({ label, value, detail, indicatorColor }: { label: string; value: string; detail: string; indicatorColor?: "green" | "red" | "yellow" }) {
+  const colorClasses = {
+    green: "border-l-[10px] border-l-emerald-500/40 border-y border-r border-y-white/10 border-r-white/10",
+    red: "border-l-[10px] border-l-rose-500/40 border-y border-r border-y-white/10 border-r-white/10",
+    yellow: "border-l-[10px] border-l-amber-500/40 border-y border-r border-y-white/10 border-r-white/10",
+  };
+
+  const borderClass = indicatorColor ? colorClasses[indicatorColor] : "border border-white/10";
+
   return (
-    <article className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-2xl shadow-cyan-950/20 backdrop-blur">
+    <article className={`rounded-3xl bg-white/5 p-5 shadow-2xl shadow-cyan-950/20 backdrop-blur ${borderClass}`}>
       <p className="text-sm text-slate-400">{label}</p>
       <p className="mt-3 text-3xl font-semibold">{value}</p>
       <p className="mt-2 text-sm text-cyan-200">{detail}</p>
