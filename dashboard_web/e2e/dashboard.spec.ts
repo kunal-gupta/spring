@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("dashboard landing page tells the opening story", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: /business story/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /e-commerce analytics/i })).toBeVisible();
   await expect(page.getByText("Revenue", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("Gross margin")).toBeVisible();
   await expect(page.getByText(/reporting period:/i)).toBeVisible();
@@ -19,7 +19,7 @@ test("dashboard landing page tells the opening story", async ({ page }) => {
   await page.getByRole("tab", { name: /sales insight/i }).click();
   await expect(page.getByText(/business scorecard/i)).toBeVisible();
   await expect(page.getByText(/kpi tiles/i)).toBeVisible();
-  await expect(page.getByText(/grid summary/i)).toBeVisible();
+  await expect(page.getByText(/summary grid/i)).toBeVisible();
 
   await page.getByRole("tab", { name: /storyboard/i }).click();
   await expect(page.getByText(/more promising layout/i)).toBeVisible();

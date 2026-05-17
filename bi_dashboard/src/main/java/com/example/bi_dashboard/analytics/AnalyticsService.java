@@ -15,11 +15,22 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service class responsible for handling business logic, data processing, and database interactions
+ * for the dashboard analytics. It uses DuckDB, an embedded in-memory database, to query CSV datasets efficiently.
+ */
 @Service
 public class AnalyticsService {
     private static final String DATASET_ROOT = "dataset/Maven+Fuzzy+Factory/";
     private Connection connection;
 
+    /**
+     * Initializes the DuckDB database connection and loads the dataset from CSV files into SQL tables and views.
+     * This method is called automatically by Spring after the service bean is constructed, thanks to the {@link PostConstruct} annotation.
+     *
+     * @throws SQLException If an error occurs while executing SQL commands to set up tables and views.
+     * @throws IOException  If an error occurs while copying the dataset from the classpath to a temporary directory.
+     */
     @PostConstruct
     void initialize() throws SQLException, IOException {
         connection = DriverManager.getConnection("jdbc:duckdb:");
@@ -80,6 +91,12 @@ public class AnalyticsService {
         }
     }
 
+    /**
+     * Calculates the overall dashboard summary KPIs (Key Performance Indicators) by querying the pre-calculated facts view.
+     *
+     * @return A {@link DashboardSummary} object populated with the calculated metrics.
+     * @throws SQLException If an error occurs during database query execution.
+     */
     public DashboardSummary getSummary() throws SQLException {
         try (Statement statement = connection.createStatement();
              ResultSet rs = statement.executeQuery("""
@@ -110,6 +127,12 @@ public class AnalyticsService {
         }
     }
 
+    /**
+     * Retrieves the sales trend data, grouped by month, to be used in charts.
+     *
+     * @return A list of {@link SalesTrendPoint} objects ordered chronologically.
+     * @throws SQLException If an error occurs during database query execution.
+     */
     public List<SalesTrendPoint> getSalesTrend() throws SQLException {
         List<SalesTrendPoint> trend = new ArrayList<>();
         try (Statement statement = connection.createStatement();
@@ -135,6 +158,13 @@ public class AnalyticsService {
         return trend;
     }
 
+    /**
+     * Fetches metadata for the dashboard, such as the minimum and maximum order dates,
+     * and the list of available products, which are typically used to populate filters.
+     *
+     * @return A {@link DashboardMetadata} object containing contextual dashboard information.
+     * @throws SQLException If an error occurs during database query execution.
+     */
     public DashboardMetadata getMetadata() throws SQLException {
         String minDate;
         String maxDate;
@@ -164,6 +194,13 @@ public class AnalyticsService {
         return new DashboardMetadata(minDate, maxDate, products);
     }
 
+    /**
+     * Helper method to copy the dataset CSV files from the application's classpath (resources)
+     * into a temporary filesystem directory. DuckDB needs standard file paths to read the CSV files.
+     *
+     * @return The {@link Path} to the temporary directory containing the copied CSV files.
+     * @throws IOException If an error occurs while creating the directory or copying files.
+     */
     private Path copyDatasetToTempDirectory() throws IOException {
         Path tempDirectory = Files.createTempDirectory("bi-dashboard-dataset");
         for (String fileName : List.of("orders.csv", "order_items.csv", "order_item_refunds.csv", "products.csv")) {
@@ -173,10 +210,22 @@ public class AnalyticsService {
         return tempDirectory;
     }
 
+    /**
+     * Normalizes a file path to a string format compatible with DuckDB SQL queries (using forward slashes).
+     *
+     * @param path The {@link Path} to normalize.
+     * @return A normalized path string.
+     */
     private String normalize(Path path) {
         return path.toAbsolutePath().toString().replace("\\", "/");
     }
 
+    /**
+     * Rounds a double value to one decimal place for presentation purposes.
+     *
+     * @param value The value to round.
+     * @return The value rounded to one decimal place.
+     */
     private double round1(double value) {
         return Math.round(value * 10.0) / 10.0;
     }

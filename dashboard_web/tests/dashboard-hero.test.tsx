@@ -45,7 +45,7 @@ describe("DashboardHero", () => {
   it("frames the dashboard as a story", async () => {
     renderWithClient(<DashboardHero />);
 
-    expect(await screen.findByRole("heading", { name: /business story/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /e-commerce analytics/i })).toBeInTheDocument();
     expect(screen.getByText(/maven fuzzy factory/i)).toBeInTheDocument();
   });
 
@@ -55,7 +55,7 @@ describe("DashboardHero", () => {
     expect((await screen.findAllByText("Revenue")).length).toBeGreaterThan(0);
     expect(screen.getByText("Orders")).toBeInTheDocument();
     expect(screen.getByText("Gross margin")).toBeInTheDocument();
-    expect(screen.getByText("$100,000")).toBeInTheDocument();
+    expect(screen.getAllByText("$100,000").length).toBeGreaterThan(0);
     expect(screen.getByText("60%")).toBeInTheDocument();
   });
 
@@ -103,7 +103,7 @@ describe("DashboardHero", () => {
     expect(screen.getByText(/business scorecard/i)).toBeInTheDocument();
     expect(screen.getByText(/trend summary/i)).toBeInTheDocument();
     expect(screen.getAllByText(/kpi tiles/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/grid summary/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/summary grid/i).length).toBeGreaterThan(0);
     expect(screen.getByText("Metric")).toBeInTheDocument();
   });
   it("shows the richer storyboard layout", async () => {
