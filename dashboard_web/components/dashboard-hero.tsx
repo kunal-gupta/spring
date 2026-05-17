@@ -221,10 +221,10 @@ export function DashboardHero() {
   };
 
   return (
-    <main className="min-h-screen px-4 py-4 text-slate-100 md:px-6 lg:px-8">
-      <section className="mx-auto flex max-w-7xl gap-5">
+    <main className="h-screen overflow-hidden px-4 py-4 text-slate-100 md:px-6 lg:px-8">
+      <section className="flex h-full w-full gap-5">
         <aside
-          className={`shrink-0 rounded-[2rem] border border-white/10 bg-slate-950/60 p-4 shadow-2xl shadow-slate-950/30 backdrop-blur transition-all ${
+          className={`flex shrink-0 flex-col overflow-y-auto rounded-[2rem] border border-white/10 bg-slate-950/60 p-4 shadow-2xl shadow-slate-950/30 backdrop-blur transition-all ${
             isDocked ? "w-72" : "w-20"
           }`}
           aria-label="Analysis navigation"
@@ -269,7 +269,7 @@ export function DashboardHero() {
           </nav>
         </aside>
 
-        <div className="min-w-0 flex-1 rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 shadow-2xl shadow-slate-950/20 backdrop-blur md:p-8">
+        <div className="min-w-0 flex-1 overflow-y-auto rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 shadow-2xl shadow-slate-950/20 backdrop-blur md:p-8">
         <div className="max-w-3xl">
           <p className="mb-3 text-sm uppercase tracking-[0.3em] text-cyan-300">Maven Fuzzy Factory</p>
           <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
