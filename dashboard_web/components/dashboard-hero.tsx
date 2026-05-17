@@ -59,7 +59,7 @@ export function DashboardHero() {
     { id: "products" as const, label: "Product Intelligence", icon: Boxes },
     { id: "profitability" as const, label: "Profitability", icon: ReceiptText },
     { id: "refunds" as const, label: "Refunds & Quality", icon: RefreshCcw },
-    { id: "gridStudio" as const, label: "Grid Studio", icon: Boxes },
+    { id: "gridStudio" as const, label: "Sales Insight", icon: Boxes },
     { id: "storyboard" as const, label: "Storyboard", icon: BarChart3 }
   ];
 
@@ -94,7 +94,7 @@ export function DashboardHero() {
     products: (
       <InsightPanel
         title="Product intelligence"
-        body={`The catalog currently contains ${metadata.data.products.length} products. This tab is ready for the next vertical slice: contribution mix, unit volume, and margin by product.`}
+        body={`The catalog contains ${metadata.data.products.length} products. Next is contribution, volume, and margin by product.`}
       />
     ),
     profitability: (
@@ -106,7 +106,7 @@ export function DashboardHero() {
         </div>
         <InsightPanel
           title="Profitability lens"
-          body="This view separates scale from quality: revenue shows momentum, while gross margin reveals whether the business is becoming more valuable as it grows."
+          body="This view separates scale from quality: revenue is momentum, margin is value."
         />
       </>
     ),
@@ -119,7 +119,7 @@ export function DashboardHero() {
         </div>
         <InsightPanel
           title="Refund pressure"
-          body="Refunds are small enough to preserve the story of growth, but large enough to deserve their own operating lens as the dashboard deepens."
+          body="Refunds are small, but significant enough to justify close monitoring."
         />
       </>
     ),
@@ -128,24 +128,26 @@ export function DashboardHero() {
         <section className="rounded-[2rem] border border-cyan-300/20 bg-cyan-300/[0.05] p-5 shadow-2xl shadow-cyan-950/20">
           <div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <p className="text-sm uppercase tracking-[0.22em] text-cyan-300">Root grid editor</p>
-              <h2 className="mt-2 text-2xl font-semibold">Nested scorecard composition</h2>
+              <p className="text-sm uppercase tracking-[0.22em] text-cyan-300">Scorecard</p>
+              <h2 className="mt-2 text-2xl font-semibold">Business scorecard</h2>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
-              <EditorBadge label="Child free flow editor" />
-              <EditorBadge label="Child grid editor" />
-              <EditorBadge label="Child auto editor" />
+              <span className="rounded-full border border-cyan-200/20 bg-cyan-200/10 px-3 py-1 text-cyan-100">Trend group</span>
+              <span className="rounded-full border border-cyan-200/20 bg-cyan-200/10 px-3 py-1 text-cyan-100">KPI tiles</span>
+              <span className="rounded-full border border-cyan-200/20 bg-cyan-200/10 px-3 py-1 text-cyan-100">Summary grid</span>
             </div>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[1.05fr_1fr]">
             <div className="rounded-[1.6rem] border border-white/10 bg-slate-950/20 p-4">
-              <p className="mb-4 text-xs uppercase tracking-[0.22em] text-slate-400">Child free flow editor</p>
+              <p className="mb-2 text-xs uppercase tracking-[0.22em] text-slate-400">Trend summary</p>
+              <p className="mb-4 text-sm text-slate-300">Revenue momentum over the last 12 periods.</p>
               <SalesTrendChart points={trend.data.slice(-12)} />
             </div>
 
             <div className="rounded-[1.6rem] border border-white/10 bg-slate-950/20 p-4">
-              <p className="mb-4 text-xs uppercase tracking-[0.22em] text-slate-400">Child grid editor · 2 tiles per row</p>
+              <p className="mb-2 text-xs uppercase tracking-[0.22em] text-slate-400">KPI tiles</p>
+              <p className="mb-4 text-sm text-slate-300">Six core metrics for a quick read.</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <MetricCard label="Revenue" value={formatCurrency(summary.data.revenue)} detail="Scale" />
                 <MetricCard label="Orders" value={formatCompact(summary.data.orders)} detail="Demand" />
@@ -159,7 +161,8 @@ export function DashboardHero() {
         </section>
 
         <section className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 shadow-2xl shadow-slate-950/20">
-          <p className="mb-4 text-xs uppercase tracking-[0.22em] text-slate-400">Child auto editor</p>
+          <p className="mb-2 text-xs uppercase tracking-[0.22em] text-slate-400">Summary</p>
+          <p className="mb-4 text-sm text-slate-300">High-level KPI signals for rhythm and trend.</p>
           <SummaryGrid
             rows={[
               ["Revenue", formatCurrency(summary.data.revenue), "Scale"],
@@ -337,6 +340,3 @@ function StoryBeat({ title, body }: { title: string; body: string }) {
   );
 }
 
-function EditorBadge({ label }: { label: string }) {
-  return <span className="rounded-full border border-cyan-200/20 bg-cyan-200/10 px-3 py-1 text-cyan-100">{label}</span>;
-}

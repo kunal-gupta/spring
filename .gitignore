@@ -22,6 +22,7 @@ dashboard_web/node_modules/
 dashboard_web/.next/
 dashboard_web/out/
 dashboard_web/dist/
+bi_dashboard/src/main/resources/static/_next/
 
 # Frontend test and coverage artifacts
 dashboard_web/coverage/

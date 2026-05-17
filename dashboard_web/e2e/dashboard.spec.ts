@@ -16,9 +16,10 @@ test("dashboard landing page tells the opening story", async ({ page }) => {
   await expect(page.getByRole("button", { name: /dock sidebar/i })).toBeVisible();
   await page.getByRole("button", { name: /dock sidebar/i }).click();
 
-  await page.getByRole("tab", { name: /grid studio/i }).click();
-  await expect(page.getByText(/nested scorecard composition/i)).toBeVisible();
-  await expect(page.getByText(/child grid editor · 2 tiles per row/i)).toBeVisible();
+  await page.getByRole("tab", { name: /sales insight/i }).click();
+  await expect(page.getByText(/business scorecard/i)).toBeVisible();
+  await expect(page.getByText(/kpi tiles/i)).toBeVisible();
+  await expect(page.getByText(/grid summary/i)).toBeVisible();
 
   await page.getByRole("tab", { name: /storyboard/i }).click();
   await expect(page.getByText(/more promising layout/i)).toBeVisible();

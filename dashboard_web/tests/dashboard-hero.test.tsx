@@ -98,15 +98,14 @@ describe("DashboardHero", () => {
     renderWithClient(<DashboardHero />);
 
     await screen.findAllByText("Revenue");
-    fireEvent.click(screen.getByRole("tab", { name: /grid studio/i }));
+    fireEvent.click(screen.getByRole("tab", { name: /sales insight/i }));
 
-    expect(screen.getByText(/nested scorecard composition/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/child free flow editor/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/child grid editor/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/child auto editor/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/business scorecard/i)).toBeInTheDocument();
+    expect(screen.getByText(/trend summary/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/kpi tiles/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/grid summary/i).length).toBeGreaterThan(0);
     expect(screen.getByText("Metric")).toBeInTheDocument();
   });
-
   it("shows the richer storyboard layout", async () => {
     renderWithClient(<DashboardHero />);
 
