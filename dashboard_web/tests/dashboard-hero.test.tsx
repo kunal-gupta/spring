@@ -45,7 +45,7 @@ describe("DashboardHero", () => {
   it("frames the dashboard as a story", async () => {
     renderWithClient(<DashboardHero />);
 
-    expect(await screen.findByRole("heading", { name: /a dashboard should read like a business story/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /business story/i })).toBeInTheDocument();
     expect(screen.getByText(/maven fuzzy factory/i)).toBeInTheDocument();
   });
 

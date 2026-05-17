@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("dashboard landing page tells the opening story", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: /a dashboard should read like a business story/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /business story/i })).toBeVisible();
   await expect(page.getByText("Revenue", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("Gross margin")).toBeVisible();
   await expect(page.getByText(/reporting period:/i)).toBeVisible();

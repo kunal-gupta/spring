@@ -273,7 +273,7 @@ export function DashboardHero() {
         <div className="max-w-3xl">
           <p className="mb-3 text-sm uppercase tracking-[0.3em] text-cyan-300">Maven Fuzzy Factory</p>
           <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
-            A dashboard should read like a business story.
+            Business Story
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300 md:text-lg">
             Start with the health of the business, then reveal the forces underneath: product mix, profitability, and refund pressure.
